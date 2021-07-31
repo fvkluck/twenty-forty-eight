@@ -3,26 +3,21 @@
             [twenty.main :refer :all]))
 
 (deftest main
-  (testing "first-zero-index"
-    (is (= 0 (first-zero-index [0 0 0 0])))
-    (is (= 1 (first-zero-index [2 0 2 4])))
-    (is (= 3 (first-zero-index [2 4 2 0])))
-    (is (= nil (first-zero-index [2 4 2 4])))
-    (is (= nil (first-zero-index []))))
-
-  (testing "first-index"
-    (is (= 0 (first-index zero? 0 [0 0 0 0])))
-    (is (= 1 (first-index zero? 0 [2 0 2 4])))
-    (is (= 1 (first-index zero? 1 [0 0 0 0])))
-    (is (= nil (first-index zero? 0 [2 2 4 2])))
-    (is (= nil (first-index zero? 0 []))))
-
-  (testing "last-index"
-    (is (= 0 (last-index zero? 0 [0 2 4 2])))
-    (is (= 3 (last-index zero? 0 [0 0 0 0])))
-    (is (= nil (last-index zero? 0 [2 4 2 4])))
-    (is (= nil (last-index zero? 0 [])))
-    (is (= 3 (last-index zero? 2 [2 4 0 0]))))
+  (testing "rotate-ccw"
+    (is (= [[4 8 12 16]
+            [3 7 11 15]
+            [2 6 10 14]
+            [1 5 9  13]]
+           (rotate-ccw [[1 2 3 4]
+                        [5 6 7 8]
+                        [9 10 11 12]
+                        [13 14 15 16]])))
+    (is (= [[3 6 9]
+            [2 5 8]
+            [1 4 7]]
+           (rotate-ccwd [[1 2 3]
+                         [4 5 6]
+                         [7 8 9]]))))
 
   (testing "pad-zeroes"
     (is (= [1 2 3 0 0 0] (pad-zeroes 6 [1 2 3])))
