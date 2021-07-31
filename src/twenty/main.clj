@@ -42,6 +42,32 @@
        (reverse)
        (vec)))
 
+(def rotate-cw
+  (apply comp (repeat 3 rotate-ccw)))
+
+(defn left-move [board]
+  (vec (for [row board]
+    (squash-row row))))
+
+(defn up-move [board]
+  (->> board
+       (rotate-ccw)
+       (left-move)
+       (rotate-cw)))
+
+(defn right-move [board]
+  (->> board
+       (rotate-ccw)
+       (rotate-ccw)
+       (left-move)
+       (rotate-cw)
+       (rotate-cw)))
+
+(defn down-move [board]
+  (->> board
+       (rotate-cw)
+       (left-move)
+       (rotate-ccw)))
 
 (defn -main [args]
   (println "hello"))
