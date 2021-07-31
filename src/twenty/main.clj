@@ -6,13 +6,6 @@
    [0 0 0 0]
    [0 2 2 0]])
 
-(defn rotate-ccw [board]
-  "Rotate the board counter clock-wise"
-  (->> board
-       (apply map vector)
-       (reverse)
-       (vec)))
-
 (defn pad-zeroes [n row]
   "Add zeroes to the ned of row, to achieve length n."
   (concat row (repeat (- n (count row)) 0)))
@@ -39,7 +32,15 @@
           :result []})
        (:result)
        (filter (comp not zero?))
-       (pad-zeroes (count row))))
+       (pad-zeroes (count row))
+       (vec)))
+
+(defn rotate-ccw [board]
+  "Rotate the board counter clock-wise"
+  (->> board
+       (apply map vector)
+       (reverse)
+       (vec)))
 
 
 (defn -main [args]
