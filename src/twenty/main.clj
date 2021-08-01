@@ -69,5 +69,30 @@
        (left-move)
        (rotate-ccw)))
 
+(defn has-won? [board]
+  (->> board
+       (apply concat)
+       (some #(= 1024 %))
+       (boolean)))
+
+(defn empty-tiles [board]
+  (let [n (count board)]
+    (->> (for [i (range n)
+               j (range n)]
+           [i j])
+         (map (fn [[i j]]
+                [[i j] (get-in board [i j])]))
+         (filter (comp zero? second))
+         (map first))))
+
+(defn random-block []
+  (rand-nth [2 4]))
+
+(defn generate-block [board]
+  (let [target (->> board
+                    (empty-tiles)
+                    (rand-nth))]
+    (assoc-in board target (random-block))))
+
 (defn -main [args]
   (println "hello"))
