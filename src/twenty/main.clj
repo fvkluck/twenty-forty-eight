@@ -1,9 +1,11 @@
-(ns twenty.main)
+(ns twenty.main
+  (:require [cljfx.api :as fx]
+            [clojure.string :as string]))
 
 (def board
   [[2 0 2 0]
    [0 8 0 8]
-   [0 0 0 0]
+   [2048 0 0 0]
    [0 2 2 0]])
 
 (defn pad-zeroes [n row]
@@ -96,3 +98,30 @@
 
 (defn -main [args]
   (println "hello"))
+
+(defn board->str [board]
+  (->> board
+       (map #(map (partial format "%7d") %))
+       (map (partial string/join " "))
+       (string/join "\n")))
+
+(def renderer
+    (fx/create-renderer))
+
+(defn root [{:keys [showing board]}]
+  {:fx/type :stage
+   :showing showing
+   :scene {:fx/type :scene
+           :root {:fx/type :v-box
+                  :padding 50
+                  :children [{:fx/type :text
+                              :font {:family "monospaced"}
+                              :text (board->str board)}
+                             {:fx/type :button
+                              :text "close"
+                              :on-action (fn [_]
+                                           (renderer {:fx/type root
+                                                      :showing false}))}]}}})
+(renderer {:fx/type root
+           :showing true
+           :board board})
