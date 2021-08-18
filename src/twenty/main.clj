@@ -3,7 +3,7 @@
             [clojure.string :as string]))
 
 (defn pad-zeroes [n row]
-  "Add zeroes to the ned of row, to achieve length n."
+  "Add zeroes to the end of row, to achieve length n."
   (concat row (repeat (- n (count row)) 0)))
 
 (defn squash-row [row]
