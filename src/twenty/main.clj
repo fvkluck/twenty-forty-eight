@@ -87,6 +87,9 @@
          (filter (comp zero? second))
          (map first))))
 
+(defn random-block []
+  (rand-nth [2 2 2 4]))
+
 (defn generate-block [board]
   (let [target (->> board
                     (empty-tiles)
@@ -115,6 +118,11 @@
        (some #(= 1024 %))
        (boolean)))
 
+(defn is-lost? [board]
+  (->> board
+       (legal-moves)
+       (empty?)))
+
 (defn handle-keystroke [board ch]
   (let [new-board (if-let [move-fn ((legal-moves board) ch)]
                     (->> board
@@ -126,14 +134,6 @@
       (is-lost? new-board) [[\n \a \y \!]]
       :else new-board)))
 
-
-(defn is-lost? [board]
-  (->> board
-       (legal-moves)
-       (empty?)))
-
-(defn random-block []
-  (rand-nth [2 2 2 4]))
 
 (defn -main [args]
   (println "hello"))
