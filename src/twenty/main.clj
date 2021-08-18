@@ -130,10 +130,9 @@
                          generate-block)
                     board)]
     (cond
-      (has-won? new-board) [[\y \a \y \!]]
-      (is-lost? new-board) [[\n \a \y \!]]
+      (has-won? new-board) [[1 2 3 4]]
+      (is-lost? new-board) [[4 0 0 3]]
       :else new-board)))
-
 
 (defn -main [args]
   (println "hello"))
