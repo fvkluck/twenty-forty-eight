@@ -71,11 +71,11 @@
        (left-move)
        (rotate-ccw)))
 
-(defn has-won? [board]
-  (->> board
-       (apply concat)
-       (some #(= 1024 %))
-       (boolean)))
+(def moves
+  {"W" up-move
+   "S" down-move
+   "A" left-move
+   "D" right-move})
 
 (defn empty-tiles [board]
   (let [n (count board)]
@@ -87,17 +87,60 @@
          (filter (comp zero? second))
          (map first))))
 
-(defn random-block []
-  (rand-nth [2 4]))
-
 (defn generate-block [board]
   (let [target (->> board
                     (empty-tiles)
                     (rand-nth))]
     (assoc-in board target (random-block))))
 
+(defn generate-start-board []
+  (->> [[0 0 0 0]
+        [0 0 0 0]
+        [0 0 0 0]
+        [0 0 0 0]]
+       generate-block
+       generate-block))
+
+(defn legal-move? [board move-fn]
+  (not (= (move-fn board) board)))
+
+(defn legal-moves [board]
+  (->> moves
+       (filter (fn [[k v]] (legal-move? board v)))
+       (into {})))
+
+(defn has-won? [board]
+  (->> board
+       (apply concat)
+       (some #(= 1024 %))
+       (boolean)))
+
+(defn handle-keystroke [board ch]
+  (let [new-board (if-let [move-fn ((legal-moves board) ch)]
+                    (->> board
+                         move-fn
+                         generate-block)
+                    board)]
+    (cond
+      (has-won? new-board) [[\y \a \y \!]]
+      (is-lost? new-board) [[\n \a \y \!]]
+      :else new-board)))
+
+
+(defn is-lost? [board]
+  (->> board
+       (legal-moves)
+       (empty?)))
+
+(defn random-block []
+  (rand-nth [2 2 2 4]))
+
 (defn -main [args]
   (println "hello"))
+
+(def state
+  (atom {:board (generate-start-board)
+         :showing true}))
 
 (defn board->str [board]
   (->> board
@@ -105,13 +148,11 @@
        (map (partial string/join " "))
        (string/join "\n")))
 
-(def renderer
-    (fx/create-renderer))
-
 (defn root [{:keys [showing board]}]
   {:fx/type :stage
    :showing showing
    :scene {:fx/type :scene
+           :on-key-pressed (fn [e] (swap! state update :board #(handle-keystroke % (-> e .getCode .getName))))
            :root {:fx/type :v-box
                   :padding 50
                   :children [{:fx/type :text
@@ -119,9 +160,10 @@
                               :text (board->str board)}
                              {:fx/type :button
                               :text "close"
-                              :on-action (fn [_]
-                                           (renderer {:fx/type root
-                                                      :showing false}))}]}}})
-(renderer {:fx/type root
-           :showing true
-           :board board})
+                              :on-action (fn [_] (swap! state assoc :showing false))}]}}})
+
+(def renderer
+  (fx/create-renderer
+    :middleware (fx/wrap-map-desc assoc :fx/type root)))
+
+(fx/mount-renderer state renderer)
