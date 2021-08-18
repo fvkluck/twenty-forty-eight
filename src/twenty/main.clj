@@ -115,7 +115,7 @@
 (defn has-won? [board]
   (->> board
        (apply concat)
-       (some #(= 1024 %))
+       (some #(= 2048 %))
        (boolean)))
 
 (defn is-lost? [board]
