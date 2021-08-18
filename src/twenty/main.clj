@@ -2,12 +2,6 @@
   (:require [cljfx.api :as fx]
             [clojure.string :as string]))
 
-(def board
-  [[2 0 2 0]
-   [0 8 0 8]
-   [2048 0 0 0]
-   [0 2 2 0]])
-
 (defn pad-zeroes [n row]
   "Add zeroes to the ned of row, to achieve length n."
   (concat row (repeat (- n (count row)) 0)))
@@ -166,3 +160,6 @@
     :middleware (fx/wrap-map-desc assoc :fx/type root)))
 
 (fx/mount-renderer state renderer)
+
+(defn -main [args]
+  (fx/mount-renderer state renderer))
