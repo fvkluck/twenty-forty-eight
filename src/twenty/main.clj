@@ -117,22 +117,23 @@
        (legal-moves)
        (empty?)))
 
-(defn handle-keystroke [board ch]
-  (let [new-board (if-let [move-fn ((legal-moves board) ch)]
+(defn handle-keystroke [game ch]
+  (let [board (:board game)
+        new-board (if-let [move-fn ((legal-moves board) ch)]
                     (->> board
                          move-fn
                          generate-block)
                     board)]
     (cond
-      (has-won? new-board) [[1 2 3 4]]
-      (is-lost? new-board) [[4 0 0 3]]
-      :else new-board)))
-
-(defn -main [args]
-  (println "hello"))
+      (has-won? new-board) (-> game
+                               (assoc :won true)
+                               (assoc :board new-board))
+      (is-lost? new-board) (assoc game :board [[4 0 0 3]])
+      :else (assoc game :board new-board))))
 
 (def state
-  (atom {:board (generate-start-board)
+  (atom {:game {:board (generate-start-board)
+                :won false}
          :showing true}))
 
 (defn board->str [board]
@@ -141,23 +142,32 @@
        (map (partial string/join " "))
        (string/join "\n")))
 
-(defn root [{:keys [showing board]}]
+(defn root [{:keys [showing game]}]
   {:fx/type :stage
    :showing showing
    :scene {:fx/type :scene
-           :on-key-pressed (fn [e] (swap! state update :board #(handle-keystroke % (-> e .getCode .getName))))
+           :on-key-pressed {:event/type ::key-pressed}
            :root {:fx/type :v-box
                   :padding 50
                   :children [{:fx/type :text
+                              :text (if (:won game)
+                                      "Congratulations!"
+                                      "Reach 2048 to beat this game!")}
+                             {:fx/type :text
                               :font {:family "monospaced"}
-                              :text (board->str board)}
+                              :text (board->str (:board game))}
                              {:fx/type :button
                               :text "close"
                               :on-action (fn [_] (swap! state assoc :showing false))}]}}})
 
+(defn map-event-handler [e]
+  (case (:event/type e)
+    ::key-pressed (swap! state update :game #(handle-keystroke % (-> (:fx/event  e) .getCode .getName)))))
+
 (def renderer
   (fx/create-renderer
-    :middleware (fx/wrap-map-desc assoc :fx/type root)))
+    :middleware (fx/wrap-map-desc assoc :fx/type root)
+    :opts {:fx.opt/map-event-handler map-event-handler}))
 
 (fx/mount-renderer state renderer)
 
