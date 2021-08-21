@@ -169,7 +169,7 @@
 
 (defn map-event-handler [e]
   (case (:event/type e)
-    ::key-pressed (swap! state update :game #(handle-keystroke % (-> (:fx/event  e) .getCode .getName)))))
+    ::key-pressed (swap! state update :game #(handle-keystroke % (-> (:fx/event e) .getCode .getName)))))
 
 (def renderer
   (fx/create-renderer
