@@ -142,6 +142,17 @@
        (map (partial string/join " "))
        (string/join "\n")))
 
+(defn game-field [{:keys [board won]}]
+  {:fx/type :v-box
+   :padding 50
+   :children [{:fx/type :text
+               :text (if won
+                       "Congratulations!"
+                       "Reach 2048 to beat this game!")}
+              {:fx/type :text
+               :font {:family "monospaced"}
+               :text (board->str board)}]})
+
 (defn root [{:keys [showing game]}]
   {:fx/type :stage
    :showing showing
@@ -149,13 +160,9 @@
            :on-key-pressed {:event/type ::key-pressed}
            :root {:fx/type :v-box
                   :padding 50
-                  :children [{:fx/type :text
-                              :text (if (:won game)
-                                      "Congratulations!"
-                                      "Reach 2048 to beat this game!")}
-                             {:fx/type :text
-                              :font {:family "monospaced"}
-                              :text (board->str (:board game))}
+                  :children [{:fx/type game-field
+                              :board (:board game)
+                              :won (:won game)}
                              {:fx/type :button
                               :text "close"
                               :on-action (fn [_] (swap! state assoc :showing false))}]}}})
