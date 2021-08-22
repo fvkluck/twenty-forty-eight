@@ -164,18 +164,6 @@
            :requested-width 50
            :preserve-ratio true}})
 
-(comment
-  (defn game-field [{:keys [game]}]
-    {:fx/type :v-box
-     :padding 50
-     :children [{:fx/type :text
-                 :text (if (:won game)
-                         "Congratulations!"
-                         "Reach 2048 to beat this game!")}
-                {:fx/type :text
-                 :font {:family "monospaced"}
-                 :text (board->str (:board game))}]}))
-
 (defn game-field [{:keys [game]}]
     {:fx/type :v-box
      :padding 50
