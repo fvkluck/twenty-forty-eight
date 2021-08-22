@@ -39,6 +39,7 @@
        (vec)))
 
 (def rotate-cw
+  "Rotate the board clock-wise"
   (apply comp (repeat 3 rotate-ccw)))
 
 (defn left-move [board]
@@ -157,16 +158,35 @@
        (map (partial string/join " "))
        (string/join "\n")))
 
+(defn number->image [nr]
+  {:fx/type :image-view
+   :image {:url (str "file:resources/" nr ".jpg")
+           :requested-width 50
+           :preserve-ratio true}})
+
+(comment
+  (defn game-field [{:keys [game]}]
+    {:fx/type :v-box
+     :padding 50
+     :children [{:fx/type :text
+                 :text (if (:won game)
+                         "Congratulations!"
+                         "Reach 2048 to beat this game!")}
+                {:fx/type :text
+                 :font {:family "monospaced"}
+                 :text (board->str (:board game))}]}))
+
 (defn game-field [{:keys [game]}]
-  {:fx/type :v-box
-   :padding 50
-   :children [{:fx/type :text
-               :text (if (:won game)
-                       "Congratulations!"
-                       "Reach 2048 to beat this game!")}
-              {:fx/type :text
-               :font {:family "monospaced"}
-               :text (board->str (:board game))}]})
+    {:fx/type :v-box
+     :padding 50
+     :children [{:fx/type :text
+                 :text (if (:won game)
+                         "Congratulations!"
+                         "Reach 2048 to beat this game!")}
+                {:fx/type :v-box
+                 :children (for [row (:board game)]
+                              {:fx/type :h-box
+                               :children (map number->image row)})}]})
 
 (defn root [{:keys [showing game]}]
   {:fx/type :stage
