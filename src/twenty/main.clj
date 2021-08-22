@@ -160,7 +160,7 @@
 
 (defn number->image [nr]
   {:fx/type :image-view
-   :image {:url (str "file:resources/" nr ".jpg")
+   :image {:url (str "file:resources/tiles/" nr ".jpg")
            :requested-width 50
            :preserve-ratio true}})
 
