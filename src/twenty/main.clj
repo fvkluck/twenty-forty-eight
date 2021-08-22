@@ -134,22 +134,24 @@
                     board)]
     (cond
       (has-won? new-board) (-> game
-                               (assoc :won true)
+                               (assoc :state :won)
                                (assoc :board new-board))
-      (is-lost? new-board) (assoc game :board [[4 0 0 3]])
+      (is-lost? new-board) (-> game
+                               (assoc :state :lost)
+                               (assoc :board new-board))
       :else (assoc game :board new-board))))
 
-(defn handle-keystroke [game ch]
+(defn handle-keystroke [state ch]
   (case ch
-    "W" (make-move game :up-move)
-    "S" (make-move game :down-move)
-    "A" (make-move game :left-move)
-    "D" (make-move game :right-move)
-    :else game))
+    "W" (update state :game #(make-move % :up-move))
+    "S" (update state :game #(make-move % :down-move))
+    "A" (update state :game #(make-move % :left-move))
+    "D" (update state :game #(make-move % :right-move))
+    :else state))
 
 (def state
   (atom {:game {:board (generate-start-board)
-                :won false}
+                :state :playing}
          :showing true}))
 
 (defn board->str [board]
@@ -168,9 +170,10 @@
     {:fx/type :v-box
      :padding 50
      :children [{:fx/type :text
-                 :text (if (:won game)
-                         "Congratulations!"
-                         "Reach 2048 to beat this game!")}
+                 :text (case (:state game)
+                         :won "Congratulations!"
+                         :playing "Reach 2048 to beat this game!"
+                         :lost "I'm sorry for your loss")}
                 {:fx/type :v-box
                  :children (for [row (:board game)]
                               {:fx/type :h-box
@@ -185,13 +188,20 @@
                   :padding 50
                   :children [{:fx/type game-field
                               :game game}
-                             {:fx/type :button
-                              :text "close"
-                              :on-action (fn [_] (swap! state assoc :showing false))}]}}})
+                             {:fx/type :h-box
+                              :children [{:fx/type :button
+                                          :text "restart"
+                                          :on-action {:event/type ::restart-pressed}}
+                                         {:fx/type :button
+                                          :text "close"
+                                          :on-action (fn [_] (swap! state assoc :showing false))}]}]}}})
 
 (defn map-event-handler [e]
   (case (:event/type e)
-    ::key-pressed (swap! state update :game #(handle-keystroke % (-> (:fx/event e) .getCode .getName)))))
+    ::key-pressed (swap! state #(handle-keystroke % (-> (:fx/event e) .getCode .getName)))
+    ::restart-pressed (swap! state update :game #(-> %
+                                                     (assoc :board (generate-start-board))
+                                                     (assoc :state :playing)))))
 
 (def renderer
   (fx/create-renderer
