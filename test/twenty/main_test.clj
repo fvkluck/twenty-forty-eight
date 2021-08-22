@@ -84,6 +84,16 @@
   (testing "empty-tiles"
     (is (= [[0 0] [1 1]] (empty-tiles [[0 1] [2 0]]))))
 
+  (testing "legal-moves"
+    (is (= [] (legal-moves [[1 2 3 4]
+                            [5 6 7 8]
+                            [9 10 11 12]
+                            [13 14 15 16]]))
+        (= [left-move right-move] (legal-moves [[2 2 3 4]
+                                     [5 6 7 8]
+                                     [9 10 11 12]
+                                     [13 14 15 16]]))))
+
   (testing "make-move"
     (are [move-fn move] (<= (nof-different-blocks
                               (move-fn [[2 2 4 4]

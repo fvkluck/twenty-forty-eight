@@ -65,12 +65,6 @@
        (left-move)
        (rotate-ccw)))
 
-(def moves
-  {"W" :up-move
-   "S" :down-move
-   "A" :left-move
-   "D" :right-move})
-
 (defn empty-tiles [board]
   (let [n (count board)]
     (->> (for [i (range n)
@@ -102,9 +96,9 @@
   (not (= (move-fn board) board)))
 
 (defn legal-moves [board]
-  (->> moves
-       (filter (fn [[k v]] (legal-move? board v)))
-       (into {})))
+  (->> [up-move down-move left-move right-move]
+       (filter (fn [move-fn] (legal-move? board move-fn)))
+       (into [])))
 
 (defn has-won? [board]
   (->> board
@@ -145,9 +139,12 @@
       :else (assoc game :board new-board))))
 
 (defn handle-keystroke [game ch]
-  (if (moves ch)
-    (make-move game (moves ch))
-    game))
+  (case ch
+    "W" (make-move game :up-move)
+    "S" (make-move game :down-move)
+    "A" (make-move game :left-move)
+    "D" (make-move game :right-move)
+    :else game))
 
 (def state
   (atom {:game {:board (generate-start-board)
