@@ -66,10 +66,10 @@
        (rotate-ccw)))
 
 (def moves
-  {"W" up-move
-   "S" down-move
-   "A" left-move
-   "D" right-move})
+  {"W" :up-move
+   "S" :down-move
+   "A" :left-move
+   "D" :right-move})
 
 (defn empty-tiles [board]
   (let [n (count board)]
@@ -117,9 +117,22 @@
        (legal-moves)
        (empty?)))
 
-(defn handle-keystroke [game ch]
-  (let [board (:board game)
-        new-board (if-let [move-fn ((legal-moves board) ch)]
+(defn nof-different-blocks [board1 board2]
+  (let [board1 [[1 2 3 4] [5 6 7 8]]
+        board2 [[1 2 3 5] [5 6 7 8]]
+        v1 (apply concat board1)
+        v2 (apply concat board2)]
+    (reduce + (map (fn [x y] (if (= x y) 0 1)) v1 v2))))
+
+
+(defn make-move [game move]
+  (let [moves {:up-move up-move
+               :down-move down-move
+               :left-move left-move
+               :right-move right-move}
+        board (:board game)
+        move-fn (moves move)
+        new-board (if (legal-move? board move-fn)
                     (->> board
                          move-fn
                          generate-block)
@@ -130,6 +143,11 @@
                                (assoc :board new-board))
       (is-lost? new-board) (assoc game :board [[4 0 0 3]])
       :else (assoc game :board new-board))))
+
+(defn handle-keystroke [game ch]
+  (if (moves ch)
+    (make-move game (moves ch))
+    game))
 
 (def state
   (atom {:game {:board (generate-start-board)
@@ -142,16 +160,16 @@
        (map (partial string/join " "))
        (string/join "\n")))
 
-(defn game-field [{:keys [board won]}]
+(defn game-field [{:keys [game]}]
   {:fx/type :v-box
    :padding 50
    :children [{:fx/type :text
-               :text (if won
+               :text (if (:won game)
                        "Congratulations!"
                        "Reach 2048 to beat this game!")}
               {:fx/type :text
                :font {:family "monospaced"}
-               :text (board->str board)}]})
+               :text (board->str (:board game))}]})
 
 (defn root [{:keys [showing game]}]
   {:fx/type :stage
@@ -161,8 +179,7 @@
            :root {:fx/type :v-box
                   :padding 50
                   :children [{:fx/type game-field
-                              :board (:board game)
-                              :won (:won game)}
+                              :game game}
                              {:fx/type :button
                               :text "close"
                               :on-action (fn [_] (swap! state assoc :showing false))}]}}})

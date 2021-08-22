@@ -82,4 +82,20 @@
                        [8 8 8 8]]))))
 
   (testing "empty-tiles"
-    (is (= [[0 0] [1 1]] (empty-tiles [[0 1] [2 0]])))))
+    (is (= [[0 0] [1 1]] (empty-tiles [[0 1] [2 0]]))))
+
+  (testing "make-move"
+    (are [move-fn move] (<= (nof-different-blocks
+                              (move-fn [[2 2 4 4]
+                                         [2 0 0 2]
+                                         [4 0 4 8]
+                                         [8 8 8 8]])
+                              (make-move {:board [[2 2 4 4]
+                                                  [2 0 0 2]
+                                                  [4 0 4 8]
+                                                  [8 8 8 8]]
+                                          :won false} move)) 1)
+         left-move :left-move
+         right-move :right-move
+         up-move :up-move
+         down-move :down-move)))
