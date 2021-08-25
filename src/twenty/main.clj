@@ -113,9 +113,7 @@
        (empty?)))
 
 (defn nof-different-blocks [board1 board2]
-  (let [board1 [[1 2 3 4] [5 6 7 8]]
-        board2 [[1 2 3 5] [5 6 7 8]]
-        v1 (apply concat board1)
+  (let [v1 (apply concat board1)
         v2 (apply concat board2)]
     (reduce + (map (fn [x y] (if (= x y) 0 1)) v1 v2))))
 
