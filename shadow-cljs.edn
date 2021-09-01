@@ -1,0 +1,12 @@
+{:builds {:twenty {:output-dir "resources"
+                   :target :browser
+                   :modules {:main {:entries [twenty.view]}}}}
+
+ :source-paths ["src"]
+
+ :dev-http {8000 "resources"}
+
+ :dependencies [[reagent/reagent "1.1.0"]
+                [cider/cider-nrepl "0.26.0"]]
+
+ }
